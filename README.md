@@ -3,7 +3,7 @@
 **Tania Graff** | Promo A Part Time
 
 **Consultas SQL.**
-Este proyecto utiliza la base de datos Sakila, que simula un videoclub o una tienda de alquiler de películas, para realizar las consultas SQL necesarias para extraer y analizar los datos almacenados en sus 17 tablas. 
+Este proyecto utiliza la base de datos Sakila, que simula una tienda de alquiler de películas, para realizar las consultas SQL necesarias para extraer y analizar los datos almacenados en sus 17 tablas. 
 
 ![imagen_portada_modulo](portada_repo.png)
 
