@@ -492,6 +492,10 @@ WHERE actor.actor_id NOT IN (
 a 180 minutos en la tabla film.
 */
 
+#Para encontrar el título de las películas de la categoría 'Comedy', realizo una subconsulta utilizando el operador de comparación Where.
+#De este modo busco los film_id que se encuentran dentro de la categoría comedia.
+#Dentro de la subconsulta uno la tabla film con film_category y con category volviendo a utilizar Where para encontrar los registros en los que el nombre de la categoría sea igual a 'Comedy' y la duración sea mayor de 180 minutos.
+
 #SEUDOCÓDIGO
 #film -> film_id, title, length > 180
 #film_category -> film_id, category_id
@@ -515,6 +519,9 @@ consulta debe mostrar el nombre y apellido de los actores y el número de pelíc
 que han actuado juntos.
 */
 
+#Al utilizar la cláusula SELECT, añado la función CONCAT para unir los registros de las columnas first_name y last_name en una sola, ya que facilita la legibilidad del código.
+#Uno la tabla film_actor consigo misma y hago lo mismo con la tabla actor. Luego uno entre sí las tablas a través de los alias para encontrar a las películas en las que han coincidido los actores.
+
 #SEUDOCÓDIGO
 #actor -> actor_id, first_name, last_name
 #film_actor -> actor_id, film_id = film_id
@@ -522,16 +529,28 @@ que han actuado juntos.
 SELECT 
 CONCAT(actor1.first_name, ' ', actor1.last_name) AS actor_1,
 CONCAT(actor2.first_name, ' ', actor2.last_name) AS actor_2,
-COUNT(film_actor1.film_id) AS num_peliculas_juntas
+COUNT(*) AS num_peliculas_juntas
 FROM film_actor AS film_actor1
 JOIN film_actor AS film_actor2 
-ON film_actor1.film_id = film_actor2.film_id
+ON film_actor1.film_id = film_actor2.film_id 
 JOIN actor AS actor1 
 ON film_actor1.actor_id = actor1.actor_id
 JOIN actor AS actor2 
 ON film_actor2.actor_id = actor2.actor_id
-WHERE actor1.actor_id < actor2.actor_id
 GROUP BY actor_1, actor_2;
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-   
+    
    
