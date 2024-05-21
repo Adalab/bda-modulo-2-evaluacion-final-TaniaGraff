@@ -36,7 +36,7 @@ ORDER BY film_id;
 "amazing" en su descripción.
 */
 
-#Utilizo la cláusula LIKE para encontrar todos los títulos de películas donde su descripción incluye la palabra "amazing".
+#Utilizo la cláusula LIKE para encontrar todos los títulos de películas que en su descripción incluya la palabra "amazing".
 #Incluyo los % delante y detrás de la palabra porque no se especifica la posición del texto en el que ha de aparecer la palabra "amazing".
 
 SELECT 
@@ -49,7 +49,7 @@ WHERE description LIKE '%amazing%';
 -- Ejercicio 4. Encuentra el título de todas las películas que tengan una duración mayor a 120 minutos.
 */
 
-#Utilizo el operador de condición WHERE para filtrar los resultados y encontrar todos los títulos de las películas, cuya duración supere los 120 minutos.
+#Utilizo el operador de condición WHERE para filtrar los resultados y encontrar todos los títulos de las películas cuya duración supera los 120 minutos.
 
 SELECT 
 title,
@@ -87,7 +87,7 @@ WHERE last_name LIKE '%Gibson%';
 -- Ejercicio 7. Encuentra los nombres de los actores que tengan un actor_id entre 10 y 20.
 */
 
-#Utilizo la cláusula BETWEEN junto al operador de condición WHERE para encontrar a los actores cuyos id se encuentran entre el 10 y el 20 (ambos inclusuive).
+#Utilizo la cláusula BETWEEN junto al operador de condición WHERE para encontrar a los actores cuyos id se encuentran entre el 10 y el 20 (ambos incluídos).
 
 SELECT 
 actor_id,
@@ -114,7 +114,8 @@ WHERE rating NOT IN ('R', 'PG-13');
 clasificación junto con el recuento.
 */
 
-#Utilizo la función agregada COUNT(film_id) para contar todas las películas que hay asocidadas a cada clasificación.
+#Utilizo la función agregada COUNT(film_id) para contar todas las películas que hay asocidadas a cada clasificación. 
+#No utilizo la cláusula DISTINCT porque estoy contando el total de películas en base a su id único.
 #Renombro el resultado utilizando AS para crear una columna temporal con el recuento.
 #Agrupo los resultados utilizando la sentencia GROUP BY ya que he utilizado una función agregada.
 
@@ -123,7 +124,7 @@ clasificación junto con el recuento.
 
 SELECT
 rating,
-COUNT(film_id) AS num_films
+COUNT(film_id) AS film_count
 FROM film
 GROUP BY rating;
 
@@ -144,11 +145,12 @@ SELECT
 customer.customer_id,
 customer.first_name,
 customer.last_name,
-COUNT(rental.rental_id) AS num_rental_films
+COUNT(rental.rental_id) AS film_rental_count
 FROM customer
 JOIN rental
 ON customer.customer_id = rental.customer_id
-GROUP BY customer.customer_id,
+GROUP BY 
+customer.customer_id,
 customer.first_name,
 customer.last_name;
 
@@ -168,7 +170,7 @@ la categoría junto con el recuento de alquileres.
 
 SELECT
 category.name AS category_name,
-COUNT(rental.rental_id) AS num_rental_films
+COUNT(rental.rental_id) AS film_rental_count
 FROM category
 JOIN film_category
 ON category.category_id = film_category.category_id
@@ -178,20 +180,20 @@ JOIN rental
 ON inventory.inventory_id = rental.inventory_id
 GROUP BY category.name;
 
-
 /* 
 -- Ejercicio 12. Encuentra el promedio de duración de las películas para cada clasificación de la tabla
 film y muestra la clasificación junto con el promedio de duración.
 */
 
-#Utilizo la función agregada AVG para econtrar la media de duración (length) en función de cada una de las categorías del rating.
+#Utilizo la función agregada AVG para econtrar la media de duración (length) de cada una de las categorías del rating.
+#Al utilizar la función agregada AVG, incluyo la sentencia GROUP BY para agrupar los resultados en función de su clasificación.
 
 #SEUDOCÓDIGO
 #film -> AVG(length), rating
 
 SELECT
 rating,
-AVG(length) AS duracion_media
+AVG(length) AS film_average_duration
 FROM film
 GROUP BY rating;
 
@@ -201,7 +203,7 @@ Love".
 */
 
 #En este caso utilizo una subconsulta para filtrar el nombre y apellido de los actores que aparecen en la película que lleva por titulo 'Indian Love'.
-#En la subconsulta uno por el film_id las tablas de film_actor, donde se incluye el id de cada actor con la de film, donde se incluye el título de cada película.
+#En la subconsulta uno por el film_id la tabla de film_actor (donde se incluye el id de cada actor) con la de film (donde se incluye el título de cada película).
 
 #SEUDOCÓDIGO
 #actor -> actor_id, first_name, last_name
@@ -268,7 +270,7 @@ SELECT
 -- Ejercicio 16. Encuentra el título de todas las películas que fueron lanzadas entre el año 2005 y 2010.
 */
 
-#Utilizo la cláusula BETWEEN junto al WHERE para encontrar los títulos de las películas que se han lanzado entre 2005 y 2010.
+#Utilizo la cláusula BETWEEN junto al operador de condición WHERE para encontrar los títulos de las películas que se han lanzado entre 2005 y 2010.
 
 #SEUDOCÓDIGO
 #film -> title, release_year (BETWEEN 2005 AND 2010)
@@ -284,7 +286,7 @@ WHERE release_year BETWEEN 2005 AND 2010;
 */
 
 #Realizo una subconsulta para filtrar los id de las películas que se encuentran en la categoría 'Family'.
-#En la subconsula uno dos tablas, la de film_category con category, ya que es en esta tabla donde encontramos los nomrbes de las categorías.
+#En la subconsulta uno dos tablas, la de film_category con category, ya que es en esta tabla donde encontramos los nombres de las categorías.
 
 #SEUDOCÓDIGO
 #film -> title, film_id
@@ -307,6 +309,7 @@ WHERE film.film_id IN (
 */
 
 #Utilizo la función COUNT(DISTINCT) para contar el número de películas diferentes en las que aparece cada actor.
+#Incluyo el id del actor por si hubiera actores con el mismo nombre y apellidos.
 #Uno la tabla de actor con la de film_actor através del id de actor para relacionar a los actores con las películas.
 #Al utilizar la función agregada COUNT necesito utilizar la sentencia GROUP BY.
 #Y por último utilizo la sentencia HAVING para que la query sólo me devuelva el nombre y apellidos de aquellos actores que han participado en más de 10 películas.
@@ -316,6 +319,7 @@ WHERE film.film_id IN (
 #film_actor -> actor_id, COUNT(DISTINCT film_id)
 
 SELECT
+actor.actor_id,
 actor.first_name, 
 actor.last_name,
 COUNT(DISTINCT film_actor.film_id) AS film_count
@@ -323,6 +327,7 @@ FROM actor
 JOIN film_actor 
 ON actor.actor_id = film_actor.actor_id
 GROUP BY
+actor.actor_id,
 actor.first_name,
 actor.last_name
 HAVING COUNT(DISTINCT film_actor.film_id) > 10;
@@ -332,22 +337,24 @@ HAVING COUNT(DISTINCT film_actor.film_id) > 10;
 	
     WITH ActorsFilms AS (
 		SELECT
+        actor.actor_id,
         actor.first_name, 
         actor.last_name,
-        COUNT(DISTINCT film_actor.film_id) AS num_films
+        COUNT(DISTINCT film_actor.film_id) AS film_count
         FROM actor
 		JOIN film_actor 
 		ON actor.actor_id = film_actor.actor_id
 		GROUP BY
+        actor.actor_id,
 		actor.first_name,
 		actor.last_name
         )
 SELECT
     first_name,
     last_name,
-    num_films
+    film_count
 FROM ActorsFilms
-WHERE num_films > 10;
+WHERE film_count > 10;
 
 /* 
 -- Ejercicio 19. Encuentra el título de todas las películas que son "R" y tienen una duración mayor a 2
@@ -372,8 +379,8 @@ WHERE length > 120 AND rating = 'R';
 minutos y muestra el nombre de la categoría junto con el promedio de duración.
 */
 
-#Utilizo una CTE para primero calcular las duración media de las películas por cada categoría.
-#Para realizar la CTE necesito unir tres tablas, la de category con film_category, y esta a su vez con film, ya que es en esta tabla donde tengo los registros de la duración (length).
+#Utilizo una CTE para calcular primero las duración media de las películas por categoría.
+#Para realizar la CTE necesito unir tres tablas, la de category con film_category y esta a su vez con film, ya que es en esta tabla donde tengo los registros de la duración (length).
 #Y luego hago la consulta para que me devuelva solo aquellos registros que superen los 120 minutos de duración.
 
 #SEUDOCÓDIGO
@@ -403,22 +410,26 @@ WHERE average_length > 120;
 actor junto con la cantidad de películas en las que han actuado.
 */
 
-#Utilizo una CTE para agrupara a los actores por el número de película en las que han actuado.
-#En la CTE uno dos tablas, utilizo la función agregada COUNT(DISTINCT) para
+#Utilizo una CTE para agrupar a los actores por el número de película en las que han actuado.
+#En la CTE uno dos tablas, utilizo la función agregada COUNT() para obtener el número de películas diferentes en las que han actuado.
+#Incluyo el id de cada actor por si hubiera actores con el mismo nombre y apellidos.
+#Al hacer la consulta utilizo el operador de comparación WHERE para filtrar los resultados y obtener los datos de los actores que han actuado en al menos 5 películas.
 
 #SEUDOCÓDIGO
 #actor-> actor_id, first_name, last_name
-#film_actor -> actor_id, COUNT(DISTINCT film_id) > 5
+#film_actor -> actor_id, COUNT(film_id) > 5
 
 	WITH ActorsFilms AS (
 		SELECT  
+        actor.actor_id,
         actor.first_name, 
         actor.last_name,
-        COUNT(DISTINCT film_actor.film_id) AS num_films
+        COUNT(film_actor.film_id) AS film_count
 		FROM actor
 		JOIN film_actor 
         ON actor.actor_id = film_actor.actor_id
 		GROUP BY
+        actor.actor_id,
         actor.first_name,
         actor.last_name
 	)
@@ -426,13 +437,13 @@ actor junto con la cantidad de películas en las que han actuado.
 SELECT
     first_name,
     last_name,
-    num_films
+    film_count
 FROM ActorsFilms
-WHERE num_films >= 5;
-	
+WHERE film_count >= 5;
+
  /* 
--- Ejercicio 22. Encuentra el título de todas las películas que fueron alquiladas por más de 5 días. Utiliza
-una subconsulta para encontrar los rental_ids con una duración superior a 5 días y luego
+-- Ejercicio 22. Encuentra el título de todas las películas que fueron alquiladas por más de 5 días. 
+Utiliza una subconsulta para encontrar los rental_ids con una duración superior a 5 días y luego
 selecciona las películas correspondientes.
 */
 
@@ -462,7 +473,7 @@ la categoría "Horror". Utiliza una subconsulta para encontrar los actores que h
 en películas de la categoría "Horror" y luego exclúyelos de la lista de actores.
 */
 
-#Para seleccionar los nombres y apellidos de los actores que no tienen un ID en común con los actores que han actuado en películas de la categoría "Horror" realizo una subconsulta para filtrar los id con la cláusula WHERE.
+#Para seleccionar los nombres y apellidos de los actores que no tienen un Id en común con los actores que han actuado en películas de la categoría "Horror" realizo una subconsulta para filtrar los id con la cláusula WHERE.
 #En la subconsula uno tres tablas para finalmente poder encontrar el nombre y apellido de todos los actores, menos los que han actuado en alguna película perteneciente a la categoría 'Horror'.
 
 #SEUDOCÓDIGO
@@ -482,6 +493,7 @@ WHERE actor.actor_id NOT IN (
     JOIN category ON film_category.category_id = category.category_id
     WHERE category.name = 'Horror'
 );
+
 
 /* 
 -- BONUS --
@@ -521,15 +533,16 @@ que han actuado juntos.
 
 #Al utilizar la cláusula SELECT, añado la función CONCAT para unir los registros de las columnas first_name y last_name en una sola, ya que facilita la legibilidad del código.
 #Uno la tabla film_actor consigo misma y hago lo mismo con la tabla actor. Luego uno entre sí las tablas a través de los alias para encontrar a las películas en las que han coincidido los actores.
+#Utilizo el operador de comparación Where y el símbolo desigual '<>' para evitar que en los resultados los actores se crucen consigo mismo.
 
 #SEUDOCÓDIGO
-#actor -> actor_id, first_name, last_name
+#actor -> actor_id <> actor_id, first_name, last_name
 #film_actor -> actor_id, film_id = film_id
     
 SELECT 
 CONCAT(actor1.first_name, ' ', actor1.last_name) AS actor_1,
 CONCAT(actor2.first_name, ' ', actor2.last_name) AS actor_2,
-COUNT(*) AS num_peliculas_juntas
+COUNT(*) AS movies_together_count
 FROM film_actor AS film_actor1
 JOIN film_actor AS film_actor2 
 ON film_actor1.film_id = film_actor2.film_id 
@@ -537,8 +550,9 @@ JOIN actor AS actor1
 ON film_actor1.actor_id = actor1.actor_id
 JOIN actor AS actor2 
 ON film_actor2.actor_id = actor2.actor_id
-GROUP BY actor_1, actor_2;
-
+WHERE actor1.actor_id <> actor2.actor_id
+GROUP BY actor_1, actor_2
+ORDER BY movies_together_count DESC;
 
 
 
